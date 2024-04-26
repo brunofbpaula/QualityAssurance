@@ -17,6 +17,8 @@ public class ConsultaIBGE {
     // URL base da API do IBGE para distritos
     private static final String DISTRITOS_API_URL = "https://servicodados.ibge.gov.br/api/v1/localidades/distritos/";
 
+    private static final String MUNICIPIOS_API_URL = "https://servicodados.ibge.gov.br/api/v1/localidades/municipios/";
+
     /**
      * Método para consultar informações de um estado específico.
      *
@@ -45,6 +47,23 @@ public class ConsultaIBGE {
         in.close();
 
         // Retorna a resposta da API como uma string
+        return response.toString();
+    }
+
+    public static String consultarMunicipio(int codigo) throws IOException {
+
+        URL url = new URL(MUNICIPIOS_API_URL + codigo);
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
         return response.toString();
     }
 
