@@ -3,16 +3,17 @@ package org.estudos.br;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ConsultaIBGETest {
     private static final String ESTADOS_API_URL = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/";
+    private static final String MUNICIPIOS_API_URL = "https://servicodados.ibge.gov.br/api/v1/localidades/municipios/";
 
 
     @Test
@@ -35,7 +36,7 @@ public class ConsultaIBGETest {
     }
 
     @Test
-    @DisplayName("Teste para consultar distrito")
+    @DisplayName("Teste para verificar a response da consulta a distrito")
     public void testConsultarDistrito() throws IOException {
 
         // Número do distrito de Águas de Santa Bárbara
@@ -62,4 +63,39 @@ public class ConsultaIBGETest {
         assertEquals(expectedReponse, response);
 
     }
+
+    @Test
+    @DisplayName("Teste para consulta de munícipios de um estado")
+    public void testConsultarMunicipios() throws IOException {
+
+        int codigo = 1600303;
+
+        // Act
+        String resposta = ConsultaIBGE.consultarMunicipio(codigo);
+
+        // Assert
+        // Verifica se a resposta não está vazia
+        assert !resposta.isEmpty();
+
+        // Verifica se o status code é 200 (OK)
+        HttpURLConnection connection = (HttpURLConnection) new URL(MUNICIPIOS_API_URL + codigo).openConnection();
+        int statusCode = connection.getResponseCode();
+        assertEquals(200, statusCode, "O status code da resposta da API deve ser 200 (OK)");
+    }
+
+    @Test
+    @DisplayName("Teste para validar opção escolhida do menu")
+    public void testValidarEscolha() {
+
+        InputStream input = new ByteArrayInputStream("100\n3\n".getBytes());
+        System.setIn(input);
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        Main.main(new String[]{});
+
+        assertTrue(output.toString().contains("Opção inválida."));
+    }
+
 }
